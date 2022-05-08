@@ -15,6 +15,8 @@ ress = []
 cages = []
 cages_res = []
 hungers= []
+res_kol = 1000
+cage_kol = 100
 res_pos = randrange(100, 1100), randrange(100, 700)
 gravity = 1
 
@@ -64,13 +66,13 @@ def update():
             x, y, cage_res, hunger = cages[i].x, cages[i].y, cages_res[i], hungers[i]
             opt_x, opt_y, re = opt_x_and_y(x, y)
             if m == 100:
-                create_res(300)
+                create_res(res_kol)
                 m = 0
             if hunger < 100:
                 if cage_res == 1:
                     hungers[i] = 0
                     cages_res[i] = 0
-                    print('Cage index:', i, 'eat res in position:', x, y)
+                    #print('Cage index:', i, 'eat res in position:', x, y)
                 else:
                     if opt_x > x:
                         x += gravity
@@ -84,11 +86,11 @@ def update():
 
                     if x < opt_x+5 and x > opt_x-5 and y > opt_y-5 and y < opt_y+5:
                         cages_res[i] = 1
-                        print('Cage index:', i, 'take res in position:', opt_x, opt_y)
+                        #print('Cage index:', i, 'take res in position:', opt_x, opt_y)
                         if ress[re] in delete_res:
                             pass
                         else:
-                            print('DelR', re)
+                            #print('DelR', re)
                             delete_res.append(re)
 
                     if x <= 0:
@@ -106,37 +108,45 @@ def update():
                 if cages[i] in delete_cage:
                     pass
                 else:
-                    print('DelC:', i)
+                    #print('DelC:', i)
                     delete_cage.append(i)
-            print('Move:', move, 'Planet position:', i, x, y, cages_res[i], opt_x, opt_y)
+            #print('Move:', move, 'Planet position:', i, x, y, cages_res[i], opt_x, opt_y)
             cages[i] = pg.draw.circle(win, (255, 0, 0), (x + 4, y + 4), 4)
         move += 1
         m += 1
 
         for i in range(len(delete_res)):
-            print('D_r:', i)
-            print(delete_res[i])
+            #print('D_r:', i)
+            #print(delete_res[i])
             try:
                 ress.pop(delete_res[i])
             except IndexError:
                 ress.pop()
 
         for i in range(len(delete_cage)):
-            print('D_c:', i)
-            print(delete_cage[i])
+            #print('D_c:', i)
+            #print(delete_cage[i])
             try:
                 cages.pop(delete_cage[i])
             except IndexError:
                 cages.pop()
+            try:
+                cages_res.pop(delete_cage[i])
+            except IndexError:
+                cages_res.pop()
+            try:
+                hungers.pop(delete_cage[i])
+            except IndexError:
+                hungers.pop()
 
     else:
         print('Dead!')
         exit()
 
-for i in range(20):
+for i in range(cage_kol):
     create_cage((randrange(400, 800), randrange(200, 600)))
 
-create_res(300)
+create_res(res_kol)
 
 while True:
     for i in pg.event.get():
@@ -145,22 +155,35 @@ while True:
         if i.type == pg.MOUSEBUTTONDOWN:
             if i.button == 1:
                 create_cage(i.pos)
+                print("Cage has be create in position:", i.pos)
             elif i.button == 2:
-                create_res(10)
+                res_kol += 100
+                print('Res_kol:', res_kol)
             elif i.button == 3:
-                create_res_in_pos(i.pos)
-        elif i.type == pg.K_1:
-            FPS += 1
-            print('FPS:', FPS)
-        elif i.type == pg.K_2:
-            FPS -= 1
-            print('FPS:', FPS)
-        elif i.type == pg.K_3:
-            FPS += 10
-            print('FPS:', FPS)
-        elif i.type == pg.K_4:
-            FPS -= 10
-            print('FPS:', FPS)
+                res_kol -= 100
+                print('Res_kol:', res_kol)
+        elif i.type == pg.KEYDOWN:
+            if i.key == pg.K_1:
+                FPS += 1
+                print('FPS:', FPS)
+            elif i.key == pg.K_2:
+                if FPS > 0:
+                    FPS -= 1
+                    print('FPS:', FPS)
+            elif i.key == pg.K_3:
+                FPS += 10
+                print('FPS:', FPS)
+            elif i.key == pg.K_4:
+                if FPS > 0:
+                    FPS -= 10
+                    print('FPS:', FPS)
+            elif i.key == pg.K_5:
+                res_kol += 10
+                print('Res_kol:', res_kol)
+            elif i.key == pg.K_6:
+                if res_kol > 0:
+                    res_kol -= 10
+                    print('Res_kol:', res_kol)
 
     pg.display.set_caption(str(int(clock.get_fps())))
     win.fill((0,0,0))
